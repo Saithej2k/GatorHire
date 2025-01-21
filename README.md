@@ -1,6 +1,7 @@
-# CareerCompass
+# CareerOrbit
 
-CareerCompass is a state-of-the-art platform designed to streamline the job search and recruitment process.
-This platform aims to connect job seekers with employers through an intuitive, high-performance system.
+CareerOrbit is a job-hunting platform built specifically for job seekers. CareerOrbit combines real-time job posts from top job-listing APIs such as Adzuna and USAJOBS into a unified and user-friendly dashboard. The platform improves job search efficiency by utilizing advanced search tools and exact parameters such as region, job type, and wage range. This enables users to personalize their searches, removing the need to manage various job boards.
+
+CareerOrbit guarantees that job searchers are kept up to date on relevant possibilities by providing personalized job suggestions and automated alerts based on user preferences. The platform's user-friendly layout makes it easier to identify and apply for jobs, allowing users to manage their job searches more effectively and increase their chances of landing a job in a competitive market.
 
 # Members
