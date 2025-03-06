@@ -1,0 +1,558 @@
+{
+	"info": {
+		"_postman_id": "f8a9e5b3-7c8d-4e5f-9a1b-c2d3e4f5a6b7",
+		"name": "GatorHire API",
+		"description": "API collection for GatorHire job board application",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\",\n    \"fullName\": \"Test User\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new user"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login with email and password"
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@gatorhire.com\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login as admin"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints"
+		},
+		{
+			"name": "Jobs",
+			"item": [
+				{
+					"name": "Get All Jobs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/jobs",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"jobs"
+							]
+						},
+						"description": "Get all jobs"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Jobs with Filters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/jobs?category=Technology&searchTerm=developer&jobType=Full-time",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"jobs"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "Technology"
+								},
+								{
+									"key": "searchTerm",
+									"value": "developer"
+								},
+								{
+									"key": "jobType",
+									"value": "Full-time"
+								}
+							]
+						},
+						"description": "Get jobs with filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Job by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/jobs/{{jobId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"jobs",
+								"{{jobId}}"
+							]
+						},
+						"description": "Get a specific job by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Job (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Frontend Developer\",\n    \"company\": \"Test Company\",\n    \"location\": \"Remote\",\n    \"type\": \"Full-time\",\n    \"salary\": \"$80,000 - $100,000\",\n    \"description\": \"We are looking for a frontend developer to join our team.\",\n    \"requirements\": [\"React\", \"JavaScript\", \"CSS\"],\n    \"responsibilities\": [\"Develop user interfaces\", \"Implement designs\"],\n    \"benefits\": [\"Health insurance\", \"Remote work\"],\n    \"category\": \"Technology\",\n    \"companyInfo\": {\n        \"name\": \"Test Company\",\n        \"description\": \"A test company\",\n        \"website\": \"https://testcompany.com\",\n        \"industry\": \"Software\",\n        \"size\": \"10-50 employees\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/jobs",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"jobs"
+							]
+						},
+						"description": "Create a new job (admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Job (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Senior Frontend Developer\",\n    \"company\": \"Test Company\",\n    \"location\": \"Remote\",\n    \"type\": \"Full-time\",\n    \"salary\": \"$90,000 - $110,000\",\n    \"description\": \"Updated description\",\n    \"requirements\": [\"React\", \"JavaScript\", \"TypeScript\"],\n    \"responsibilities\": [\"Develop user interfaces\", \"Implement designs\"],\n    \"benefits\": [\"Health insurance\", \"Remote work\"],\n    \"category\": \"Technology\",\n    \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/jobs/{{jobId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"jobs",
+								"{{jobId}}"
+							]
+						},
+						"description": "Update an existing job (admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Job (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/jobs/{{jobId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"jobs",
+								"{{jobId}}"
+							]
+						},
+						"description": "Delete a job (admin only)"
+					},
+					"response": []
+				}
+			],
+			"description": "Job endpoints"
+		},
+		{
+			"name": "Applications",
+			"item": [
+				{
+					"name": "Submit Application",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"jobId\": \"{{jobId}}\",\n    \"fullName\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"123-456-7890\",\n    \"coverLetter\": \"I am interested in this position...\",\n    \"linkedIn\": \"https://linkedin.com/in/johndoe\",\n    \"portfolio\": \"https://johndoe.com\",\n    \"heardFrom\": \"job-board\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/applications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"applications"
+							]
+						},
+						"description": "Submit a job application"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Applications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/applications/user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"applications",
+								"user"
+							]
+						},
+						"description": "Get all applications for the authenticated user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Applications by Job (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/applications/job?jobId={{jobId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"applications",
+								"job"
+							],
+							"query": [
+								{
+									"key": "jobId",
+									"value": "{{jobId}}"
+								}
+							]
+						},
+						"description": "Get all applications for a specific job (admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Application Status (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"applicationId\": \"{{applicationId}}\",\n    \"status\": \"interview\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/applications/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"applications",
+								"status"
+							]
+						},
+						"description": "Update the status of an application (admin only)"
+					},
+					"response": []
+				}
+			],
+			"description": "Application endpoints"
+		},
+		{
+			"name": "Saved Jobs",
+			"item": [
+				{
+					"name": "Save Job",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"jobId\": \"{{jobId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/saved-jobs",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"saved-jobs"
+							]
+						},
+						"description": "Save a job for the authenticated user"
+					},
+					"response": []
+				},
+				{
+					"name": "Unsave Job",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/saved-jobs?jobId={{jobId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"saved-jobs"
+							],
+							"query": [
+								{
+									"key": "jobId",
+									"value": "{{jobId}}"
+								}
+							]
+						},
+						"description": "Remove a saved job for the authenticated user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Saved Jobs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/saved-jobs",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"saved-jobs"
+							]
+						},
+						"description": "Get all saved jobs for the authenticated user"
+					},
+					"response": []
+				}
+			],
+			"description": "Saved jobs endpoints"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "jobId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "applicationId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
