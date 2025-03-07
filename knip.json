@@ -1,0 +1,11 @@
+{
+  "entry": ["frontend/main.tsx", "backend/main.go"],
+  "project": ["frontend/**/*.{ts,tsx}", "backend/**/*.go"],
+  "ignoreDependencies": ["cypress-file-upload"],
+  "ignoreExportsUsedInFile": true,
+  "rules": {
+    "dependencies": "error",
+    "devDependencies": "warn",
+    "files": "error"
+  }
+}
