@@ -8,6 +8,7 @@ import (
 
 	"github.com/gatorhire/backend/db"
 	"github.com/gatorhire/backend/handlers"
+	"github.com/gatorhire/backend/middleware"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 )
@@ -22,32 +23,38 @@ func main() {
 
 	// API routes
 	api := r.PathPrefix("/api").Subrouter()
-	
-	// Jobs endpoints
+
+	// Public routes (no authentication required)
 	api.HandleFunc("/jobs", handlers.GetJobs).Methods("GET", "OPTIONS")
 	api.HandleFunc("/jobs/{id}", handlers.GetJobByID).Methods("GET", "OPTIONS")
-	api.HandleFunc("/jobs", handlers.CreateJob).Methods("POST", "OPTIONS")
-	api.HandleFunc("/jobs/{id}", handlers.UpdateJob).Methods("PUT", "OPTIONS")
-	api.HandleFunc("/jobs/{id}", handlers.DeleteJob).Methods("DELETE", "OPTIONS")
-	
-	// Applications endpoints
-	api.HandleFunc("/applications", handlers.CreateApplication).Methods("POST", "OPTIONS")
-	api.HandleFunc("/applications/user", handlers.GetUserApplications).Methods("GET", "OPTIONS")
-	api.HandleFunc("/applications/job", handlers.GetApplicationsByJob).Methods("GET", "OPTIONS")
-	api.HandleFunc("/applications/status", handlers.UpdateApplicationStatus).Methods("PUT", "OPTIONS")
-	
-	// Saved jobs endpoints
-	api.HandleFunc("/saved-jobs", handlers.SaveJob).Methods("POST", "OPTIONS")
-	api.HandleFunc("/saved-jobs", handlers.UnsaveJob).Methods("DELETE", "OPTIONS")
-	api.HandleFunc("/saved-jobs", handlers.GetSavedJobs).Methods("GET", "OPTIONS")
-	
-	// Auth endpoints
+	api.HandleFunc("/jobs/search", handlers.SearchJobs).Methods("GET", "OPTIONS") // New endpoint
 	api.HandleFunc("/auth/login", handlers.Login).Methods("POST", "OPTIONS")
 	api.HandleFunc("/auth/register", handlers.Register).Methods("POST", "OPTIONS")
-	
-	// Profile endpoints
-	api.HandleFunc("/profile", handlers.GetProfile).Methods("GET", "OPTIONS")
-	api.HandleFunc("/profile", handlers.UpdateProfile).Methods("PUT", "OPTIONS")
+	api.HandleFunc("/applications", handlers.CreateApplication).Methods("POST", "OPTIONS")
+
+	// Authenticated routes (require JWT token)
+	authAPI := api.PathPrefix("").Subrouter()
+	authAPI.Use(middleware.AuthMiddleware)
+
+	authAPI.HandleFunc("/applications/user", handlers.GetUserApplications).Methods("GET", "OPTIONS")
+	authAPI.HandleFunc("/saved-jobs", handlers.SaveJob).Methods("POST", "OPTIONS")
+	authAPI.HandleFunc("/saved-jobs", handlers.UnsaveJob).Methods("DELETE", "OPTIONS")
+	authAPI.HandleFunc("/saved-jobs/bulk", handlers.BulkDeleteSavedJobs).Methods("DELETE", "OPTIONS") // New endpoint
+	authAPI.HandleFunc("/saved-jobs", handlers.GetSavedJobs).Methods("GET", "OPTIONS")
+	authAPI.HandleFunc("/profile", handlers.GetProfile).Methods("GET", "OPTIONS")
+	authAPI.HandleFunc("/profile", handlers.UpdateProfile).Methods("PUT", "OPTIONS")
+	authAPI.HandleFunc("/profile/stats", handlers.GetProfileStats).Methods("GET", "OPTIONS")              // New endpoint
+	authAPI.HandleFunc("/jobs/recommendations", handlers.GetJobRecommendations).Methods("GET", "OPTIONS") // New endpoint
+
+	// Admin routes (require JWT token and admin role)
+	adminAPI := api.PathPrefix("").Subrouter()
+	adminAPI.Use(middleware.AuthMiddleware, middleware.AdminMiddleware)
+
+	adminAPI.HandleFunc("/jobs", handlers.CreateJob).Methods("POST", "OPTIONS")
+	adminAPI.HandleFunc("/jobs/{id}", handlers.UpdateJob).Methods("PUT", "OPTIONS")
+	adminAPI.HandleFunc("/jobs/{id}", handlers.DeleteJob).Methods("DELETE", "OPTIONS")
+	adminAPI.HandleFunc("/applications/job", handlers.GetApplicationsByJob).Methods("GET", "OPTIONS")
+	adminAPI.HandleFunc("/applications/status", handlers.UpdateApplicationStatus).Methods("PUT", "OPTIONS")
 
 	// Set up CORS
 	corsMiddleware := cors.New(cors.Options{
