@@ -9,35 +9,35 @@ import (
 
 // User represents a user in the system
 type User struct {
-	ID        string    `json:"id"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"` // Don't expose password in JSON
-	FullName  string    `json:"fullName"`
-	Title     string    `json:"title,omitempty"`
-	Location  string    `json:"location,omitempty"`
-	Bio       string    `json:"bio,omitempty"`
-	Skills json.RawMessage `json:"skills"`
-	Role      string    `json:"role,omitempty"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID        string           `json:"id"`
+	Email     string           `json:"email"`
+	Password  string           `json:"password"` // Don't expose password in JSON
+	FullName  string           `json:"fullName"`
+	Title     *string          `json:"title,omitempty"`    // Changed to *string
+	Location  *string          `json:"location,omitempty"` // Changed to *string
+	Bio       *string          `json:"bio,omitempty"`      // Changed to *string
+	Skills    *json.RawMessage `json:"skills"`             // Changed to *json.RawMessage
+	Role      string           `json:"role,omitempty"`
+	CreatedAt time.Time        `json:"createdAt"`
 }
 
 // Job represents a job posting
 type Job struct {
-	ID             string       `json:"id"`
-	Title          string       `json:"title"`
-	Company        string       `json:"company"`
-	Location       string       `json:"location"`
-	Type           string       `json:"type"`
-	Salary         string       `json:"salary"`
-	Description    string       `json:"description"`
-	Requirements   []string     `json:"requirements"`
-	Responsibilities []string   `json:"responsibilities,omitempty"`
-	Benefits       []string     `json:"benefits,omitempty"`
-	PostedDate     time.Time    `json:"postedDate"`
-	Category       string       `json:"category"`
-	Status         string       `json:"status"`
-	CompanyInfo    *CompanyInfo `json:"companyInfo,omitempty"`
-	CreatedBy      string       `json:"createdBy,omitempty"`
+	ID               string       `json:"id"`
+	Title            string       `json:"title"`
+	Company          string       `json:"company"`
+	Location         string       `json:"location"`
+	Type             string       `json:"type"`
+	Salary           string       `json:"salary"`
+	Description      string       `json:"description"`
+	Requirements     []string     `json:"requirements"`
+	Responsibilities []string     `json:"responsibilities,omitempty"`
+	Benefits         []string     `json:"benefits,omitempty"`
+	PostedDate       time.Time    `json:"postedDate"`
+	Category         string       `json:"category"`
+	Status           string       `json:"status"`
+	CompanyInfo      *CompanyInfo `json:"companyInfo,omitempty"`
+	CreatedBy        string       `json:"createdBy,omitempty"`
 }
 
 // CompanyInfo represents information about a company
@@ -90,8 +90,8 @@ type SavedJob struct {
 
 // AuthResponse represents the response for authentication endpoints
 type AuthResponse struct {
-	Success bool  `json:"success"`
-	User    User  `json:"user"`
+	Success bool   `json:"success"`
+	User    User   `json:"user"`
 	Token   string `json:"token"`
 }
 
