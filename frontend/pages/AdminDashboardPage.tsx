@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, BarChart2, FileText, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { formatDate } from '../utils/formatters';
-import { getJobStatusBadgeClass } from '../utils/statusHelpers';
-import Button from '../components/ui/Button';
-import Card, { CardHeader, CardBody } from '../components/ui/Card';
-import JobFilter from '../components/jobs/JobFilter';
-import Badge from '../components/ui/Badge';
-import { fetchAdminJobs, deleteJob, fetchUserApplications } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { formatDate } from '../../../frontend/utils/formatters';
+import { getJobStatusBadgeClass } from '../../../frontend/utils/statusHelpers';
+import Button from '../../../frontend/components/ui/Button';
+import Card, { CardHeader, CardBody } from '../../../frontend/components/ui/Card';
+import JobFilter from '../../../frontend/components/jobs/JobFilter';
+import Badge from '../../../frontend/components/ui/Badge';
+import { fetchAdminJobs, deleteJob, fetchUserApplications } from '../../../frontend/services/api';
+import { useAuth } from '../../../frontend/context/AuthContext';
 
 const AdminDashboardPage: React.FC = () => {
   const { user } = useAuth();
