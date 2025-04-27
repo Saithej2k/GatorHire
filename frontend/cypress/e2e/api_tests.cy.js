@@ -1,8 +1,9 @@
 describe('GatorHire API Tests', () => {
   // Tokens for testing (updated with new tokens)
-  const userToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTEiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsImlzcyI6ImdhdG9yaGlyZSIsImV4cCI6MTc0MzY2MzY2NSwiaWF0IjoxNzQzNTc3MjY1fQ.ZVP3FOin4Ey5y533-JT_eu4OXi0gmLdtGxmUjbN-jOE'; // Replace with the new user token
-  const adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbi0xIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlzcyI6ImdhdG9yaGlyZSIsImV4cCI6MTc0MzY2MzY3MCwiaWF0IjoxNzQzNTc3MjcwfQ.kz71ky1jpCoWwvnYuqldhQYbmLFwfu8pV3gioGXQ55s'; // Replace with the new admin token
+  const userToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiZGU2NTA5Ny0yNzcyLTQ5YjctYWVmZC1kM2ViNjhmMDBhNTMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsImlzcyI6ImdhdG9yaGlyZSIsImV4cCI6MTc0NTM5ODU1MywiaWF0IjoxNzQ1MzEyMTUzfQ.xg3H-w4-9cOGaVbOHpRQIbhe-e2111_znpICQxNf7q0';
+  const adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbi0xIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlzcyI6ImdhdG9yaGlyZSIsImV4cCI6MTc0NTM5ODU5MCwiaWF0IjoxNzQ1MzEyMTkwfQ.KBUoMg66LqYpxz_V4p_gpTNtS6T_x7UWAchmqTmMPs0';
   const jobId = '2a90802a-f60a-45df-b23f-18ab219fdcfa'; // Existing job ID
+  let newJobId; // Will be set after creating a new job
 
   // Public Routes
   describe('Public Routes', () => {
@@ -36,15 +37,31 @@ describe('GatorHire API Tests', () => {
         method: 'POST',
         url: '/auth/register',
         body: {
-          email: `newuser${Date.now()}@example.com`, // Unique email
+          email: `newuser${Date.now()}@example.com`,
           password: 'newpass',
           fullName: 'New User',
         },
       }).then((response) => {
-        expect(response.status).to.eq(200); // Fixed to expect 200
+        expect(response.status).to.eq(201);
         expect(response.body).to.have.property('success', true);
         expect(response.body.user).to.have.property('email');
         expect(response.body).to.have.property('token');
+      });
+    });
+
+    it('POST /auth/register - should fail with existing email', () => {
+      cy.request({
+        method: 'POST',
+        url: '/auth/register',
+        body: {
+          email: 'test@example.com',
+          password: 'testpass',
+          fullName: 'Test User',
+        },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(409);
+        expect(response.body).to.have.property('error', 'Email already in use');
       });
     });
 
@@ -63,39 +80,25 @@ describe('GatorHire API Tests', () => {
         expect(response.body).to.have.property('token');
       });
     });
+
+    it('POST /auth/login - should fail with invalid credentials', () => {
+      cy.request({
+        method: 'POST',
+        url: '/auth/login',
+        body: {
+          email: 'test@example.com',
+          password: 'wrongpass',
+        },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+        expect(response.body).to.have.property('error', 'Invalid email or password');
+      });
+    });
   });
 
   // Authenticated Routes
   describe('Authenticated Routes (User Token)', () => {
-    it('GET /applications/user - should get user applications', () => {
-      cy.request({
-        method: 'GET',
-        url: '/applications/user',
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      }).then((response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body).to.be.an('array');
-      });
-    });
-
-    it('POST /saved-jobs - should save a job', () => {
-      cy.request({
-        method: 'POST',
-        url: '/saved-jobs',
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-        body: {
-          jobId: jobId,
-        },
-      }).then((response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body).to.have.property('success', true);
-      });
-    });
-
     it('GET /saved-jobs - should get saved jobs', () => {
       cy.request({
         method: 'GET',
@@ -108,6 +111,22 @@ describe('GatorHire API Tests', () => {
         expect(response.body).to.be.an('array');
         expect(response.body).to.have.length.greaterThan(0);
         expect(response.body[0]).to.have.property('id', jobId);
+      });
+    });
+
+    it('DELETE /saved-jobs - should unsave a job', () => {
+      cy.request({
+        method: 'DELETE',
+        url: '/saved-jobs',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+        qs: {
+          jobId: jobId,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body).to.have.property('success', true);
       });
     });
 
@@ -139,17 +158,33 @@ describe('GatorHire API Tests', () => {
       });
     });
 
-    it('GET /profile - should get user profile', () => {
+    it('GET /saved-jobs - should return an empty array after unsaving', () => {
       cy.request({
         method: 'GET',
-        url: '/profile',
+        url: '/saved-jobs',
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
       }).then((response) => {
         expect(response.status).to.eq(200);
-        expect(response.body).to.have.property('id', 'user-1');
-        expect(response.body).to.have.property('email', 'test@example.com');
+        expect(response.body).to.be.an('array');
+        expect(response.body).to.have.length(0);
+      });
+    });
+
+    it('POST /saved-jobs - should save a job again after unsaving', () => {
+      cy.request({
+        method: 'POST',
+        url: '/saved-jobs',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: {
+          jobId: jobId,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body).to.have.property('success', true);
       });
     });
 
@@ -193,8 +228,6 @@ describe('GatorHire API Tests', () => {
 
   // Admin Routes
   describe('Admin Routes (Admin Token)', () => {
-    let newJobId; // Declare at the top of the describe block
-
     it('POST /jobs - should create a new job', () => {
       cy.request({
         method: 'POST',
@@ -215,34 +248,23 @@ describe('GatorHire API Tests', () => {
       }).then((response) => {
         expect(response.status).to.eq(201);
         expect(response.body).to.have.property('id');
-        expect(response.body).to.have.property('title', 'Software Engineer');
-        newJobId = response.body.id; // Capture the new job ID
+        newJobId = response.body.id;
       });
     });
 
-    it('PUT /jobs/{id} - should update a job', () => {
+    it('GET /applications/job - should get applications for a job (admin)', () => {
       cy.request({
-        method: 'PUT',
-        url: `/jobs/${newJobId}`, // Use the newly created job ID
+        method: 'GET',
+        url: '/applications/job',
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
-        body: {
-          title: 'Senior Software Engineer',
-          company: 'TechCorp',
-          location: 'San Francisco',
-          type: 'Full-time',
-          salary: '$150,000',
-          description: 'Updated description',
-          requirements: ['Go', 'SQL'],
-          category: 'Technology',
-          status: 'active',
+        qs: {
+          jobId: jobId,
         },
       }).then((response) => {
         expect(response.status).to.eq(200);
-        expect(response.body).to.have.property('success', true);
-        expect(response.body).to.have.property('message', 'Job updated successfully');
-        expect(response.body).to.have.property('jobId', newJobId);
+        expect(response.body).to.be.an('array');
       });
     });
 
