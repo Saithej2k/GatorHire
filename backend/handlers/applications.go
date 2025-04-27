@@ -14,6 +14,7 @@ import (
 
 func CreateApplication(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
 	// Decode the request body into the application struct
 	var app models.Application
 	err := json.NewDecoder(r.Body).Decode(&app)
