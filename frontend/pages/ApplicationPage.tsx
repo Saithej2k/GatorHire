@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Upload, CheckCircle, AlertCircle } from 'lucide-react';
-import { Job } from '../types/job';
-import { fetchJobById, submitApplication } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { Job } from '../../../frontend/types/job';
+import { fetchJobById, submitApplication } from '../../../frontend/services/api';
+import { useAuth } from '../../../frontend/context/AuthContext';
 
 const ApplicationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
