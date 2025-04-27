@@ -1,8 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createJob } from '../services/api';
+import { createJob } from '../../../frontend/services/api';
+
+import { useAuth } from '../../../frontend/context/AuthContext';
+import { Navigate } from 'react-router-dom';
+
+const EditJobPage = () => {
+  const { isAuthenticated, user } = useAuth();
+
+  if (!isAuthenticated || user?.role !== 'admin') {
+    return <Navigate to="/login" />;
+  }
+};
 
 const CreateJobPage: React.FC = () => {
+
+  
   const navigate = useNavigate();
 
   // Form State
